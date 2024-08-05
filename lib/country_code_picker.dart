@@ -23,6 +23,7 @@ class CountryCodePicker extends StatefulWidget {
   final InputDecoration searchDecoration;
   final TextStyle? searchStyle;
   final TextStyle? dialogTextStyle;
+  final TextStyle? headerTextStyle;
   final WidgetBuilder? emptySearchBuilder;
   final Function(CountryCode?)? builder;
   final bool enabled;
@@ -68,6 +69,7 @@ class CountryCodePicker extends StatefulWidget {
 
   /// Width of the flag images
   final double flagWidth;
+  final double flagHeight;
 
   /// Use this property to change the order of the options
   final Comparator<CountryCode>? comparator;
@@ -103,6 +105,7 @@ class CountryCodePicker extends StatefulWidget {
     this.searchDecoration = const InputDecoration(),
     this.searchStyle,
     this.dialogTextStyle,
+    this.headerTextStyle,
     this.emptySearchBuilder,
     this.showOnlyCountryWhenClosed = false,
     this.alignLeft = false,
@@ -113,6 +116,7 @@ class CountryCodePicker extends StatefulWidget {
     this.flagDecoration,
     this.builder,
     this.flagWidth = 32.0,
+    this.flagHeight = 32.0,
     this.enabled = true,
     this.textOverflow = TextOverflow.ellipsis,
     this.barrierColor,
@@ -127,7 +131,8 @@ class CountryCodePicker extends StatefulWidget {
     this.dialogBackgroundColor,
     this.closeIcon = const Icon(Icons.close),
     this.countryList = codes,
-    this.dialogItemPadding = const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+    this.dialogItemPadding =
+        const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
     this.searchPadding = const EdgeInsets.symmetric(horizontal: 24),
     Key? key,
   }) : super(key: key);
@@ -175,62 +180,61 @@ class CountryCodePickerState extends State<CountryCodePicker> {
         child: widget.builder!(selectedItem),
       );
     } else {
-      internalWidget = TextButton(
-        onPressed: widget.enabled ? showCountryCodePickerDialog : null,
-        child: Padding(
-          padding: widget.padding,
-          child: Flex(
-            direction: Axis.horizontal,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              if (widget.showFlagMain != null
-                  ? widget.showFlagMain!
-                  : widget.showFlag)
-                Flexible(
-                  flex: widget.alignLeft ? 0 : 1,
-                  fit: widget.alignLeft ? FlexFit.tight : FlexFit.loose,
-                  child: Container(
-                    clipBehavior: widget.flagDecoration == null
-                        ? Clip.none
-                        : Clip.hardEdge,
-                    decoration: widget.flagDecoration,
-                    margin: widget.alignLeft
-                        ? const EdgeInsets.only(right: 16.0, left: 8.0)
-                        : const EdgeInsets.only(right: 16.0),
-                    child: Image.asset(
-                      selectedItem!.flagUri!,
-                      package: 'country_code_picker',
-                      width: widget.flagWidth,
+      internalWidget = IntrinsicWidth(
+        child: TextButton(
+          onPressed: widget.enabled ? showCountryCodePickerDialog : null,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 6),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  clipBehavior:
+                      widget.flagDecoration == null ? Clip.none : Clip.hardEdge,
+                  decoration: widget.flagDecoration,
+                  margin: widget.alignLeft
+                      ? const EdgeInsets.only(right: 4.0, left: 4.0)
+                      : const EdgeInsets.only(right: 4.0),
+                  child: Image.asset(
+                    selectedItem!.flagUri!,
+                    package: 'country_code_picker',
+                    width: widget.flagWidth,
+                    height: widget.flagHeight,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.showOnlyCountryWhenClosed
+                            ? selectedItem!.toCountryStringOnly()
+                            : selectedItem.toString(),
+                        style: widget.textStyle ??
+                            Theme.of(context).textTheme.labelLarge,
+                        overflow: widget.textOverflow,
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsetsDirectional.only(start: 6, bottom: 4),
+                  alignment: AlignmentDirectional.center,
+                  child: const RotatedBox(
+                    quarterTurns: 3,
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.black,
+                      size: 16,
                     ),
                   ),
                 ),
-              if (!widget.hideMainText)
-                Flexible(
-                  fit: widget.alignLeft ? FlexFit.tight : FlexFit.loose,
-                  child: Text(
-                    widget.showOnlyCountryWhenClosed
-                        ? selectedItem!.toCountryStringOnly()
-                        : selectedItem.toString(),
-                    style: widget.textStyle ??
-                        Theme.of(context).textTheme.labelLarge,
-                    overflow: widget.textOverflow,
-                  ),
-                ),
-              if (widget.showDropDownButton)
-                Flexible(
-                  flex: widget.alignLeft ? 0 : 1,
-                  fit: widget.alignLeft ? FlexFit.tight : FlexFit.loose,
-                  child: Padding(
-                      padding: widget.alignLeft
-                          ? const EdgeInsets.only(right: 16.0, left: 8.0)
-                          : const EdgeInsets.only(right: 16.0),
-                      child: Icon(
-                        Icons.arrow_drop_down,
-                        color: Colors.grey,
-                        size: widget.flagWidth,
-                      )),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       );
@@ -295,11 +299,13 @@ class CountryCodePickerState extends State<CountryCodePicker> {
   }
 
   void showCountryCodePickerDialog() async {
-    final item = await showDialog(
-      barrierColor: widget.barrierColor ?? Colors.grey.withOpacity(0.5),
+    final item = await showModalBottomSheet(
       context: context,
-      builder: (context) => Center(
-        child: Dialog(
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      builder: (context) => FractionallySizedBox(
+        heightFactor: 0.9,
+        child: Center(
           child: SelectionDialog(
             elements,
             favoriteElements,
@@ -308,9 +314,12 @@ class CountryCodePickerState extends State<CountryCodePicker> {
             searchDecoration: widget.searchDecoration,
             searchStyle: widget.searchStyle,
             textStyle: widget.dialogTextStyle,
+            headlineTextStyle: widget.textStyle,
+            headerTextStyle: widget.headerTextStyle,
             boxDecoration: widget.boxDecoration,
             showFlag: widget.showFlagDialog ?? widget.showFlag,
             flagWidth: widget.flagWidth,
+            flagHeight: widget.flagWidth,
             size: widget.dialogSize,
             backgroundColor: widget.dialogBackgroundColor,
             barrierColor: widget.barrierColor,
