@@ -22,6 +22,8 @@ class SelectionDialog extends StatefulWidget {
   final bool hideSearch;
   final bool hideCloseIcon;
   final Icon? closeIcon;
+  final String? titleBottomSheet;
+  final String? searchPlaceholder;
 
   /// Background color of SelectionDialog
   final Color? backgroundColor;
@@ -46,7 +48,9 @@ class SelectionDialog extends StatefulWidget {
     this.searchStyle,
     this.textStyle,
     this.headlineTextStyle,
+    this.titleBottomSheet,
     this.headerTextStyle,
+    this.searchPlaceholder,
     this.boxDecoration,
     this.showFlag,
     this.flagDecoration,
@@ -97,14 +101,14 @@ class _SelectionDialogState extends State<SelectionDialog> {
             ],
           ),
           const SizedBox(
-            height: 20,
+            height: 24,
           ),
           Container(
             padding: widget.searchPadding,
             child: Row(
               children: [
                 Text(
-                  'Select your country code',
+                  widget.titleBottomSheet ?? "",
                   overflow: TextOverflow.fade,
                   style: widget.headerTextStyle,
                 ),
@@ -156,16 +160,16 @@ class _SelectionDialogState extends State<SelectionDialog> {
                         child: TextField(
                           onChanged: _filterElements,
                           style: widget.searchStyle,
-                          decoration: const InputDecoration(
-                            hintText: "Search",
-                            prefixIcon: Icon(
+                          decoration: InputDecoration(
+                            hintText: widget.searchPlaceholder,
+                            prefixIcon: const Icon(
                               Icons.search,
                               size: 30,
                             ),
                             floatingLabelAlignment:
                                 FloatingLabelAlignment.center,
                             alignLabelWithHint: true,
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                               horizontal: 15,
                               vertical: 15,
                             ),
@@ -207,7 +211,7 @@ class _SelectionDialogState extends State<SelectionDialog> {
           if (widget.showFlag!)
             Flexible(
               child: Container(
-                margin: const EdgeInsets.only(right: 16.0),
+                margin: const EdgeInsetsDirectional.only(end: 16.0),
                 decoration: widget.flagDecoration,
                 clipBehavior:
                     widget.flagDecoration == null ? Clip.none : Clip.hardEdge,
