@@ -128,7 +128,9 @@ class _SelectionDialogState extends State<SelectionDialog> {
                         onTap: () {
                           _selectItem(f);
                         },
-                        child: _buildOption(f),
+                        child: Padding(
+                            padding: widget.searchPadding,
+                            child: _buildOption(f)),
                       ),
                     ),
                   ],
@@ -153,7 +155,10 @@ class _SelectionDialogState extends State<SelectionDialog> {
                     child: Container(
                       height: 60,
                       decoration: BoxDecoration(
-                        color: const Color(0xffF5F8FD),
+                        color: Colors.white,
+                        border: Border.all(
+                          color: const Color(0xffECECEB),
+                        ),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Center(
@@ -203,37 +208,34 @@ class _SelectionDialogState extends State<SelectionDialog> {
       );
 
   Widget _buildOption(CountryCode e) {
-    return SizedBox(
-      width: 400,
-      child: Flex(
-        direction: Axis.horizontal,
-        children: <Widget>[
-          if (widget.showFlag!)
-            Flexible(
-              child: Container(
-                margin: const EdgeInsetsDirectional.only(end: 16.0),
-                decoration: widget.flagDecoration,
-                clipBehavior:
-                    widget.flagDecoration == null ? Clip.none : Clip.hardEdge,
-                child: Image.asset(
-                  e.flagUri!,
-                  package: 'country_code_picker',
-                  width: widget.flagWidth,
-                  height: 20,
-                  fit: BoxFit.fill,
-                ),
+    return Flex(
+      direction: Axis.horizontal,
+      children: <Widget>[
+        if (widget.showFlag!)
+          Flexible(
+            child: Container(
+              margin: const EdgeInsetsDirectional.only(end: 16.0),
+              decoration: widget.flagDecoration,
+              clipBehavior:
+                  widget.flagDecoration == null ? Clip.none : Clip.hardEdge,
+              child: Image.asset(
+                e.flagUri!,
+                package: 'country_code_picker',
+                width: widget.flagWidth,
+                height: 20,
+                fit: BoxFit.fill,
               ),
             ),
-          Expanded(
-            flex: 4,
-            child: Text(
-              "${e.name} (${e.dialCode})",
-              overflow: TextOverflow.fade,
-              style: widget.textStyle,
-            ),
           ),
-        ],
-      ),
+        Expanded(
+          flex: 4,
+          child: Text(
+            "${e.name} (${e.dialCode})",
+            overflow: TextOverflow.fade,
+            style: widget.textStyle,
+          ),
+        ),
+      ],
     );
   }
 
