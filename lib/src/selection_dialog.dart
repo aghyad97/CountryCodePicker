@@ -245,8 +245,17 @@ class _SelectionDialogState extends State<SelectionDialog> {
     }
 
     return Center(
-      child: Text(CountryLocalizations.of(context)?.translate('no_country') ??
-          'No country found'),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(
+            height: 100,
+          ),
+          Text(CountryLocalizations.of(context)?.translate('no_country') ??
+              'No country found'),
+        ],
+      ),
     );
   }
 
