@@ -252,8 +252,10 @@ class _SelectionDialogState extends State<SelectionDialog> {
           const SizedBox(
             height: 100,
           ),
-          Text(CountryLocalizations.of(context)?.translate('no_country') ??
-              'No country found'),
+          Text(
+            CountryLocalizations.of(context)?.translate('no_country') ??
+                'No country found.',
+          ),
         ],
       ),
     );
